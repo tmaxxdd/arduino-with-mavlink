@@ -21,6 +21,10 @@ Below there are some links with really helpful knowledge. Mostly you will find o
 
 * [Mavlink common](http://mavlink.org/messages/common) - Official mavlink's list with the all commands. The most important are numbers that stands for the appropriate message.
 
+* [Mavlink's code](https://discuss.ardupilot.org/t/mavlink-step-by-step/9629) - This article contains step by step entry for coding in mavlink. Highly recommended to read before starting to code.
+
+* [Mavlink and arduino](https://discuss.ardupilot.org/t/mavlink-step-by-step/25566) - This is a working example of professional usage mavlink protocol in the Arduino environment. Requires a lot of time to understand everything at all.
+
 ```
 MIT License
 
