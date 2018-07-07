@@ -42,12 +42,11 @@ uint8_t buf[MAVLINK_MAX_PACKET_LEN];
 
 Indicates correct connection. Should be executed firstly.
 
-```
-mav_heartbeat_pack() {
+```C++
+void mav_heartbeat_pack() {
   mavlink_message_t msg;
   uint8_t buf[MAVLINK_MAX_PACKET_LEN];
   
-  // Pack the message
   /**
    * @brief Pack a heartbeat message
    * @param system_id ID of this system
