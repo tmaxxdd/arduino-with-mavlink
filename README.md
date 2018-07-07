@@ -5,6 +5,20 @@ Tutorial that explains connection with a quadrocopter based on APM 2.6 with an A
 
 To start creating briged connection, you have to download the following libraries and software.
 
+### Software
+
+This is a mandatory software that you have to include into the project to compile it successfully. 
+
+* [Arduino](https://www.arduino.cc/en/Main/Software) - Arduino IDE
+* [ESP32](https://github.com/espressif/arduino-esp32) - Esp32 arduino library
+* [Mavlink](https://github.com/mavlink/mavlink) - Mavlink core library
+
+### Sources
+
+Below there are some links with really helpful knowledge. Mostly you will find only the official mavlink documentation which isn't sufficient and clear for begginers.
+
+
+
 ```
 MIT License
 
