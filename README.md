@@ -25,6 +25,48 @@ Below there are some links with really helpful knowledge. Mostly you will find o
 
 * [Mavlink and arduino](https://discuss.ardupilot.org/t/mavlink-step-by-step/25566) - This is a working example of professional usage mavlink protocol in the Arduino environment. Requires a lot of time to understand everything at all.
 
+## Code
+  
+Mavlink protocol doesn't send any useful information without requesting it. In the examples below you can see working requests. Code must be initiating in an interval.
+
+### Variables
+ 
+Mavlink sends one message at once. You need to declare message variable and length of a packet.  
+
+```
+mavlink_message_t msg;
+uint8_t buf[MAVLINK_MAX_PACKET_LEN];
+```
+
+### Heartbeat 
+
+Indicates correct connection. Should be executed firstly.
+
+```
+mav_heartbeat_pack() {
+  mavlink_message_t msg;
+  uint8_t buf[MAVLINK_MAX_PACKET_LEN];
+  
+  // Pack the message
+  /**
+   * @brief Pack a heartbeat message
+   * @param system_id ID of this system
+   * @param component_id ID of this component (e.g. 200 for IMU)
+   * @param msg The MAVLink message to compress the data into
+   *
+   * @param type Type of the MAV (quadrotor, helicopter, etc., up to 15 types, defined in MAV_TYPE ENUM)
+   * @param autopilot Autopilot type / class. defined in MAV_AUTOPILOT ENUM
+   * @param base_mode System mode bitfield, see MAV_MODE_FLAGS ENUM in mavlink/include/mavlink_types.h
+   * @param custom_mode A bitfield for use for autopilot-specific flags.
+   * @param system_status System status flag, see MAV_STATE ENUM
+   * @return length of the message in bytes (excluding serial stream start sign)
+   */
+  mavlink_msg_heartbeat_pack(255,0, &msg, type, autopilot_type, system_mode, custom_mode, system_state);
+  uint16_t len = mavlink_msg_to_send_buffer(buf, &msg);
+  SerialMAV.write(buf, len);
+}
+```
+
 ```
 MIT License
 
