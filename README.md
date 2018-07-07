@@ -17,7 +17,9 @@ This is a mandatory software that you have to include into the project to compil
 
 Below there are some links with really helpful knowledge. Mostly you will find only the official mavlink documentation which isn't sufficient and clear for begginers.
 
+* [Basics](https://api.ning.com/files/i*tFWQTF2R*7Mmw7hksAU-u9IABKNDO9apguOiSOCfvi2znk1tXhur0Bt00jTOldFvob-Sczg3*lDcgChG26QaHZpzEcISM5/MAVLINK_FOR_DUMMIESPart1_v.1.1.pdf) - A great document with explanation of the elementary issues of mavlink messages and issues.
 
+* [Mavlink common](http://mavlink.org/messages/common) - Official mavlink's list with the all commands. The most important are numbers that stands for the appropriate message.
 
 ```
 MIT License
