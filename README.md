@@ -93,11 +93,11 @@ void mav_arm_pack(boolean state) {
 
 The last parameter defines flight mode. Some values you can check below.
 
-//Stablize = 0
-//AltHold = 2
-//Auto = 3
-//Loiter = 5
-//Circle = 7
+*Stablize = 0
+*AltHold = 2
+*Auto = 3
+*Loiter = 5
+*Circle = 7
 
 ```C++
 void mav_set_mode() {
