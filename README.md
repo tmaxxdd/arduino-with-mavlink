@@ -104,11 +104,34 @@ void mav_set_mode() {
   mavlink_message_t msg;
   uint8_t buf[MAVLINK_MAX_PACKET_LEN];
   
+  //Set flight mode 'Stabilize'
   mavlink_msg_set_mode_pack(0xFF, 0xBE, &msg, 1, 209, 0);
   uint16_t len = mavlink_msg_to_send_buffer(buf, &msg);
   SerialMAV.write(buf, len);
 }
 ```
+
+### Overriding RC (Radio control) channels
+
+Overriding RC channels you are able to adjust motors speed and severally <b>roll, pitch, throttle, yaw</b>.
+
+```
+void mav_override_rc(int roll, int pitch, int throttle, int yaw) {
+  mavlink_message_t msg;
+  uint8_t buf[MAVLINK_MAX_PACKET_LEN];
+
+  mavlink_msg_rc_channels_override_pack(0xFF, 0xBE, &msg, 1, 1, roll, pitch, throttle, yaw, 0, 0, 0, 0);
+  uint16_t len = mavlink_msg_to_send_buffer(buf, &msg);
+  SerialMAV.write(buf, len);
+}
+```
+
+## Contribution
+
+I would like to thank Ola and Paweł for their support and contribution. They helped me a lot with documenting and looking for the sources. 
+
+* [Aleksandra Pawłowska](https://www.facebook.com/profile.php?id=100000791780809) - sources, media documentation
+* [Paweł Modzelewski](https://www.facebook.com/profile.php?id=100007422842408) - documentation, electronic consultation
 
 ```
 MIT License
