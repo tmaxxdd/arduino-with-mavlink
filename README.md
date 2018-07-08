@@ -1,6 +1,21 @@
 # arduino-with-mavlink
 Tutorial that explains connection with a quadrocopter based on APM 2.6 with an Arduino ESP32 board. Project is made like a part of the DroneTeam project.
 
+## DroneTeam Project
+
+![DroneTeamLogo](https://github.com/tmaxxdd/arduino-with-mavlink/blob/master/logoDroneTeam.png)
+
+This repository is a part of DroneTeam project. More about this project you can learn [here](http://www.droneteamproject.eu/)
+
+My school taking part in this prject you can find [here](http://www.zs10.zabrze.pl/index.php/droneteam)
+
+## DronE app
+
+All the code contained here is related with DronE android app. This app is used with ESP32 for remote control.
+
+[DronE repository]() - Source code.
+[Play Store link]() - Place where you can download the app.
+
 ## Getting Started
 
 To start creating briged connection, you have to download the following libraries and software.
