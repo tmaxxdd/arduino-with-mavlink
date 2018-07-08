@@ -65,6 +65,29 @@ void mav_heartbeat_pack() {
   SerialMAV.write(buf, len);
 }
 ```
+###Arming
+
+Main mavlink command for changing arming state is a MAV_CMD_COMPONENT_ARM_DISARM. Every <b>MAV_CMD_...</b> you have to send via <b>mavlink_msg_command_long_pack</b>. 
+
+```C++
+void mav_arm_pack(boolean state) {
+  mavlink_message_t msg;
+  uint8_t buf[MAVLINK_MAX_PACKET_LEN];
+
+  //Arm the drone
+  //400 stands for MAV_CMD_COMPONENT_ARM_DISARM
+  // 1 an 8'th argument is for ARM (0 for DISARM)
+  if(state) {
+    //ARM
+    mavlink_msg_command_long_pack(0xFF, 0xBE, &msg, 1, 1, 400, 1,1.0,0,0,0,0,0,0);
+  }else {
+    //DISARM
+    mavlink_msg_command_long_pack(0xFF, 0xBE, &msg, 1, 1, 400, 1,0.0,0,0,0,0,0,0);
+  }
+  uint16_t len = mavlink_msg_to_send_buffer(buf, &msg);
+  SerialMAV.write(buf, len);
+}
+```
 
 ```
 MIT License
