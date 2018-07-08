@@ -89,7 +89,7 @@ void mav_arm_pack(boolean state) {
 }
 ```
 
-### Chaning flight mode
+### Changing flight mode
 
 The last parameter defines flight mode. Some values you can check below.
 
@@ -115,7 +115,7 @@ void mav_set_mode() {
 
 Overriding RC channels you are able to adjust motors speed and severally <b>roll, pitch, throttle, yaw</b>.
 
-```
+```C++
 void mav_override_rc(int roll, int pitch, int throttle, int yaw) {
   mavlink_message_t msg;
   uint8_t buf[MAVLINK_MAX_PACKET_LEN];
