@@ -65,7 +65,7 @@ void mav_heartbeat_pack() {
   SerialMAV.write(buf, len);
 }
 ```
-###Arming
+### Arming
 
 Main mavlink command for changing arming state is a MAV_CMD_COMPONENT_ARM_DISARM. Every <b>MAV_CMD_...</b> you have to send via <b>mavlink_msg_command_long_pack</b>. 
 
@@ -84,6 +84,27 @@ void mav_arm_pack(boolean state) {
     //DISARM
     mavlink_msg_command_long_pack(0xFF, 0xBE, &msg, 1, 1, 400, 1,0.0,0,0,0,0,0,0);
   }
+  uint16_t len = mavlink_msg_to_send_buffer(buf, &msg);
+  SerialMAV.write(buf, len);
+}
+```
+
+### Chaning flight mode
+
+The last parameter defines flight mode. Some values you can check below.
+
+//Stablize = 0
+//AltHold = 2
+//Auto = 3
+//Loiter = 5
+//Circle = 7
+
+```C++
+void mav_set_mode() {
+  mavlink_message_t msg;
+  uint8_t buf[MAVLINK_MAX_PACKET_LEN];
+  
+  mavlink_msg_set_mode_pack(0xFF, 0xBE, &msg, 1, 209, 0);
   uint16_t len = mavlink_msg_to_send_buffer(buf, &msg);
   SerialMAV.write(buf, len);
 }
