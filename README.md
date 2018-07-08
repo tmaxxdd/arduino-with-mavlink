@@ -13,7 +13,7 @@ My school taking part in this prject you can find [here](http://www.zs10.zabrze.
 
 ![DronELogo](https://github.com/tmaxxdd/arduino-with-mavlink/blob/master/DronELogo.png)
 
-All the code contained here is related with DronE android app. This app is used with ESP32 for remote control.
+All the code contained here is related to the DronE android app. This app is used with ESP32 for remote control.
 
 [DronE repository](https://github.com/tmaxxdd/DronE) - Source code.
 [Play Store link](https://play.google.com/store/apps/details?id=com.czterysery.drone.drone) - Place where you can download the app.
