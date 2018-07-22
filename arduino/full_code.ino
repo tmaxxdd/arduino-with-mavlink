@@ -9,38 +9,46 @@
 int armLED = 12; //Yellow
 int throttleLED = 32; //Green
 int connectionLED = 26; //White
-int buttonPin = 14; //Pushbutton's input pin
-int sensorPin = 15; //Pin for an output from the lightsensor
-int buttonState = 0; //Variable for reading the pushbutton status
-int sensorValue = 0; //Output from the lightsensor
+
+//###########################
+//#Configuration for the app#
+//###########################
 
 //Reflects connection with the ESP32
 static const String PINGING = "PINGING";
 //Reflects connection with the drone
 static const String HEARTBEATING = "HEARTBEATING";
-//Shows drone's state
+//Set of the drone's state commands
 static const String ARMED = "ARMED";
 static const String DISARMED = "DISARMED";
-//Sets current flight mode
+//Set of the flight mode commands
+static const String SET_FLIGHT_MODE_STABILIZE = "SET_FLIGHT_MODE_STABILIZE";
 static const String SET_FLIGHT_MODE_ALTHOLD = "SET_FLIGHT_MODE_ALTHOLD";
 static const String SET_FLIGHT_MODE_LOITER = "SET_FLIGHT_MODE_LOITER";
-static const String SET_FLIGHT_MODE_STABILIZE = "SET_FLIGHT_MODE_STABILIZE";
-static const String SET_FLIGHT_MODE_AUTO_RETURN = "SET_FLIGHT_MODE_AUTO_RETURN";
+static const String SET_FLIGHT_MODE_AUTO_RETURN = "SET_FLIGHT_MODE_AUTO";
+static const String SET_FLIGHT_MODE_CIRCLE = "SET_FLIGHT_MODE_CIRCLE";
 
+//Available flight modes
 static const String STABILIZE = "STABILIZE";
 static const String ALTHOLD = "ALTHOLD";
 static const String LOITER = "LOITER";
+static const String AUTO = "AUTO";
+static const String CIRCLE = "CIRCLE";
 
-//Sets rotors values
+//Set of the rotors value commands
 static const String SET_ROLL = "SET_ROLL_";//+ int
 static const String SET_PITCH = "SET_PITCH_";//+ int
 static const String SET_THROTTLE = "SET_THROTTLE_";//+ int
 static const String SET_YAW = "SET_YAW_";//+ int
+
 //Sets elementary actions
 static const String SET_ARM = "SET_ARM";
 static const String SET_DISARM = "SET_DISARM";
 
-//Configuration of the drone
+//####################################
+//#Initial Configuration of the drone#
+//####################################
+
 boolean current_arm = false;
 String current_mode = STABILIZE;
 int current_roll = 0;
@@ -48,8 +56,11 @@ int current_pitch = 0;
 int current_throttle = 1150; //Min 1150 to run motors
 int current_yaw = 0;
 
-HardwareSerial SerialMAV(2); //default pins for 16RX, 17TX
+//#####################
+//#ESP32 configuration#
+//#####################
 
+HardwareSerial SerialMAV(2); //default pins for 16RX, 17TX
 //Define softAP info
 const char *ssid = "MYESP32"; //name
 const char *password = "testpassword"; //pass
@@ -74,7 +85,10 @@ int resolution = 8;
 //Init Server at port 80
 WiFiServer server(80);
 
-/* MAVLINK configuration */
+//#######################
+//#Mavlink configuration#
+//#######################
+
 int sysid = 255;//GCS                   ///< ID 20 for this airplane. 1 PX, 255 ground station
 int compid = 190;//Mission Planner                ///< The component sending the message
 int type = MAV_TYPE_QUADROTOR;   ///< This system is an airplane / fixed wing
@@ -101,8 +115,6 @@ void setup() {
 
   pinMode(armLED, OUTPUT);
   pinMode(connectionLED, OUTPUT);
-
-  pinMode(buttonPin, INPUT);
     
   //Start human-readable console
   Serial.begin(115200);
@@ -125,25 +137,6 @@ void loop() {
   WiFiClient client = server.available();
   //Control connected client
   runWifiClient(client);
-
-  /*
-   * Code for the arming red button
-   */
-
-  buttonState = digitalRead(buttonPin);
-
-  if (buttonState == HIGH) {
-    current_arm = true;
-  } else {
-    current_arm = false;
-  }
-
-  /*
-   * Code for the motor controlled via lightsensor
-   */
-
-   sensorValue = analogRead(sensorPin);
-   //Serial.println(sensorValue);
   
   // Initialize the required buffers
   mavlink_rc_channels_override_t sp;
@@ -344,14 +337,6 @@ void comm_receive() {
             Serial.println();
           }
           break;
-       default:
-            /*
-            Serial.println("Mavlink message: ");
-            Serial.print("#");
-            Serial.print(msg.msgid);
-            Serial.println("");
-            */
-          break;
       }
     }
   }
@@ -453,6 +438,14 @@ void mav_set_mode(String value) {
 
   if (value == LOITER){
     mavlink_msg_set_mode_pack(0xFF, 0xBE, &msg, 1, 209, 5);
+  }
+
+  if (value == AUTO){
+    mavlink_msg_set_mode_pack(0xFF, 0xBE, &msg, 1, 209, 3);
+  }
+
+  if (value == CIRCLE){
+    mavlink_msg_set_mode_pack(0xFF, 0xBE, &msg, 1, 209, 7);
   }
   
   uint16_t len = mavlink_msg_to_send_buffer(buf, &msg);
