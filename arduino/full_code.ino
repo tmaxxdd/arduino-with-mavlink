@@ -25,7 +25,7 @@ static const String DISARMED = "DISARMED";
 static const String SET_FLIGHT_MODE_STABILIZE = "SET_FLIGHT_MODE_STABILIZE";
 static const String SET_FLIGHT_MODE_ALTHOLD = "SET_FLIGHT_MODE_ALTHOLD";
 static const String SET_FLIGHT_MODE_LOITER = "SET_FLIGHT_MODE_LOITER";
-static const String SET_FLIGHT_MODE_AUTO_RETURN = "SET_FLIGHT_MODE_AUTO";
+static const String SET_FLIGHT_MODE_AUTO = "SET_FLIGHT_MODE_AUTO";
 static const String SET_FLIGHT_MODE_CIRCLE = "SET_FLIGHT_MODE_CIRCLE";
 
 //Available flight modes
@@ -53,7 +53,7 @@ boolean current_arm = false;
 String current_mode = STABILIZE;
 int current_roll = 0;
 int current_pitch = 0;
-int current_throttle = 1150; //Min 1150 to run motors
+int current_throttle = 0; //Min value is 1150 to run motors
 int current_yaw = 0;
 
 //#####################
@@ -71,11 +71,6 @@ static const int PING_TIME = 1000;
 // Special messages
 static const String PING_MSG = "SOCKET_PING";
 static const String CONNECTED_MSG = "SOCKET_CONNECTED";
-
-//Serial messages
-static const String LED_ON = "on";
-static const String LED_OFF = "off";
-static const String SLIDER = "SLIDER_"; //value after "_" is a expected int
 
 //ledc values
 int freq = 5000;
@@ -115,6 +110,10 @@ void setup() {
 
   pinMode(armLED, OUTPUT);
   pinMode(connectionLED, OUTPUT);
+  pinMode(throttleLED, OUTPUT);
+
+  //Initialize led indicator (thtrottle)
+  initPWMLed();
     
   //Start human-readable console
   Serial.begin(115200);
@@ -145,12 +144,19 @@ void loop() {
 
   delay(100);
 
+  //Shows if the drone is armed
+  if (current_arm){
+    digitalWrite(armLED, HIGH);
+  }else {
+    digitalWrite(armLED, LOW);
+  }
+
   /*
    * Put the configuration in loop. The config changes async. reacting
    * on app's commands.
    */
 
-  //We have to have the heartbeats to indicate side by side connection
+  //We have to send the heartbeats to indicate side by side connection
   mav_heartbeat_pack();
 
   mav_set_mode(current_mode);
@@ -190,13 +196,6 @@ void comm_receive() {
 
   //Indicates no data input
   digitalWrite(LED_BUILTIN, LOW);
-
-  //Shows if the drone is armed
-  if (current_arm){
-    digitalWrite(armLED, HIGH);
-  }else {
-    digitalWrite(armLED, LOW);
-  }
 
   //Checks if drone is connected
   while(SerialMAV.available()) {
@@ -473,30 +472,59 @@ void mav_override_rc(int roll, int pitch, int throttle, int yaw) {
 void interpreteMsg(String msg){
   //Clean the message before comparing
   msg.trim();
-  
-  if (msg == LED_ON) {
-    Serial.println("LED ON !");
-    digitalWrite(connectionLED, HIGH);
+
+  if (msg == SET_ARM) {
+    Serial.println("Set ARMED");
+    current_arm = true;
   }
 
-  if (msg == LED_OFF) {
-    Serial.println("LED OFF !");
-    digitalWrite(connectionLED, LOW);
+  if (msg == SET_DISARM) {
+    Serial.println("Set DISARMED");
+    current_arm = false;
   }
 
-  
-  if (stringContains(msg, SLIDER) >= 0){
-    msg.replace(SLIDER, "");
-  
-    int numbVal = msg.toInt();
-
-    int scaledVal = numbVal * 2.5;
-
-    Serial.println(scaledVal);
-
-    ledcWrite(ledChannel, scaledVal);
-    delay(7);
+  if (msg == SET_FLIGHT_MODE_STABILIZE) {
+    Serial.println("Set mode STABILIZE");
+    current_mode = STABILIZE;
   }
+
+  if (msg == SET_FLIGHT_MODE_ALTHOLD) {
+    Serial.println("Set mode ALTHOLD");
+    current_mode = ALTHOLD;
+  }
+
+  if (msg == SET_FLIGHT_MODE_LOITER) {
+    Serial.println("Set mode LOITER");
+    current_mode = LOITER;
+  }
+
+  if (msg == SET_FLIGHT_MODE_AUTO) {
+    Serial.println("Set mode AUTO");
+    current_mode = AUTO;
+  }
+
+  if (msg == SET_FLIGHT_MODE_CIRCLE) {
+    Serial.println("Set mode CIRCLE");
+    current_mode = CIRCLE;
+  }
+  
+  if (stringContains(msg, SET_ROLL) >= 0){
+    current_roll = readValueFromMsg(msg, SET_ROLL);
+  }
+  
+  if (stringContains(msg, SET_PITCH) >= 0){
+    current_pitch = readValueFromMsg(msg, SET_PITCH);
+  }
+
+  if (stringContains(msg, SET_THROTTLE) >= 0){
+    current_throttle = readValueFromMsg(msg, SET_THROTTLE);
+    indicateThrottle(current_throttle);
+  }
+
+  if (stringContains(msg, SET_YAW) >= 0){
+    current_yaw = readValueFromMsg(msg, SET_YAW);
+  }
+
 }
 
 /**
@@ -522,17 +550,17 @@ void send_message(WiFiClient client, String msg) {
 int stringContains(String s, String search) {
     int max = s.length() - search.length();
     int lgsearch = search.length();
-
     for (int i = 0; i <= max; i++) {
         if (s.substring(i, i + lgsearch) == search) return i;
     }
-
  return -1;
 }
 
 
-int readValueFromMsg(String message){
-  
+int readValueFromMsg(String message, String key){
+  message.replace(key, "");
+  int numbVal = message.toInt();
+  return numbVal;
 }
 
 /**
@@ -562,6 +590,38 @@ void initPWMLed(){
   //attach pin to the channel
   ledcAttachPin(throttleLED, ledChannel);
   delay(10);
+}
+
+void indicateThrottle(int throttle){
+
+  if (throttle == 0)
+    ledcWrite(ledChannel, 0);
+  
+  if (throttle > 1000 && throttle < 1125)
+    ledcWrite(ledChannel, 32); //0-255
+
+  if (throttle > 1125 && throttle < 1250)
+    ledcWrite(ledChannel, 64);
+
+  if (throttle > 1250 && throttle < 1375)
+    ledcWrite(ledChannel, 96);
+
+  if (throttle > 1375 && throttle < 1500)
+    ledcWrite(ledChannel, 128);
+
+  if (throttle > 1500 && throttle < 1625)
+    ledcWrite(ledChannel, 160);
+
+  if (throttle > 1625 && throttle < 1750)
+    ledcWrite(ledChannel, 192);
+
+  if (throttle > 1750 && throttle < 1875)
+    ledcWrite(ledChannel, 225);
+
+  if (throttle > 1875 && throttle < 2000)
+    ledcWrite(ledChannel, 255);
+    
+  delay(7);
 }
 
 /**
